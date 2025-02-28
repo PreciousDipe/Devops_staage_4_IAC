@@ -1,0 +1,54 @@
+---
+- name: Configure EC2 instance
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Clone the repository
+      git:
+        repo: "https://github.com/PreciousDipe/DevOps-Stage-4.git"
+        dest: "/home/ubuntu/DevOps-Stage-4"
+
+    - name: Create letsencrypt directory
+      file:
+        path: /letsencrypt
+        state: directory
+        mode: '0755'
+      become: true
+
+    - name: Create acme.json file
+      copy:
+        dest: /letsencrypt/acme.json
+        content: "{}"
+        mode: '0600'
+      become: true
+
+    - name: Run Docker Compose to deploy the application
+      docker_compose:
+        project_src: /home/ubuntu/DevOps-Stage-4/
+        state: present
+      become: true
+
+    - name: Start application
+      command: 
+        cmd: "docker-compose up --build -d"
+        chdir: "/home/ubuntu/DevOps-Stage-4"
