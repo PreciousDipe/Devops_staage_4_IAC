@@ -111,7 +111,7 @@ resource "aws_instance" "public_instance" {
   }
 
   provisioner "file" {
-    source      = "deploy.yml"  # Path to your Ansible playbook
+    source      = "./deploy.yml"  # Path to your Ansible playbook
     destination = "/home/ubuntu/deploy.yml"  # Where the playbook will be stored on the instance
 
     connection {
